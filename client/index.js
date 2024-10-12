@@ -113,7 +113,9 @@ async function handleAddForm(event) {
   try {
     // gunakan preventDefault untuk mencegah browser melakukan reload halaman
     // TODO: answer here
-
+    
+    
+    // return getBook;
     /*
       Ambil data dari form, simpan ke dalam variabel book
       bentuknya seperti ini:
@@ -173,7 +175,21 @@ function generateRows(books) {
     */
 
     // TODO: answer here
+
+    books.forEach(book=>{
+      rows+=`<tr class="book-item">
+        <td class="px-6 py-4 border-b">${book.title}</td>
+        <td class="px-6 py-4 border-b">${book.author}</td>
+        <td class="px-6 py-4 border-b">${book.year}</td>
+        <td class="px-6 py-4 border-b">${book.quantity}</td>
+        <td class="px-6 py-4 border-b text-center">
+          <button class="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="handleClickEditButton(${book.id})">Edit</button>
+          <button class="inline-block bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="handleClickDeleteButton(${book.id})">Hapus</button>  
+        </td>
+      </tr>`
+    });
   }
+  console.log(rows)
   return rows;
 }
 
@@ -204,6 +220,7 @@ async function loadPage() {
     case 'home':
       // panggil function fetchBooks
       // TODO: answer here
+      const getBook = await fetchBooks();
 
       main.innerHTML = pageListMainContent;
 
@@ -213,6 +230,8 @@ async function loadPage() {
         kemudian isi innerHTML dari tableBody dengan rows
       */
       // TODO: answer here
+      let rows = generateRows(books);
+      tableBody.innerHTML = rows;
 
       break;
     case 'edit':
@@ -239,6 +258,11 @@ async function fetchBooks() {
       simpan hasilnya ke variabel global books
     */
     // TODO: answer here
+    const request = await fetch("http://localhost:3333/books");
+    const response = await request.json();
+    const jsonData = await response;
+    books = jsonData;
+    
   } catch (error) {
     console.log(error);
     console.log('Terjadi kesalahan saat mengambil data buku');
