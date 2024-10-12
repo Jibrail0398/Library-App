@@ -68,14 +68,18 @@ async function handleClickEditButton(bookId) {
 }
 async function handleClickDeleteButton(bookId) {
   try {
-    // const confirmation = confirm('Apakah anda yakin ingin menghapus buku ini?');
-    // if (!confirmation) {
-    //   return;
-    // }
+    const confirmation = confirm('Apakah anda yakin ingin menghapus buku ini?');
+    if (!confirmation) {
+      return;
+    }else{
 
-    //panggil function deleteBook dengan parameter bookId
-    // TODO: answer here
-    loadPage();
+      //panggil function deleteBook dengan parameter bookId
+      // TODO: answer here
+  
+      const selectedDeleteBook = await deleteBook(bookId);
+      loadPage();
+    }
+
   } catch (error) {
     console.log(error);
     console.log('Terjadi kesalahan saat menghapus buku');
@@ -363,6 +367,12 @@ async function deleteBook(bookId) {
       id buku yang akan dihapus dikirimkan sebagai parameter function
     */
     // TODO: answer here
+    const response = await fetch(`http://localhost:3333/books/${bookId}`,{
+      method:"DELETE",
+      headers:{
+        'Content-Type':'application/json'
+      }
+    });
   } catch (error) {
     console.log(error);
     console.log('Terjadi kesalahan saat menghapus buku');
