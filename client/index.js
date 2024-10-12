@@ -55,7 +55,10 @@ async function handleClickEditButton(bookId) {
   try {
     // Ambil data buku dari server berdasarkan id, simpan hasilnya ke variabel currentBook
     // TODO: answer here
-
+    const selectedBook = await fetch(`http://localhost:3333/books/${bookId}`);
+    const book = await selectedBook.json();
+    currentBook = book;
+    console.log(currentBook)
     currentPage = 'edit';
     loadPage();
   } catch (error) {
@@ -83,7 +86,7 @@ async function handleEditForm(event) {
   try {
     // gunakan preventDefault untuk mencegah browser melakukan reload halaman
     // TODO: answer here
-
+    event.preventDefault();
     /* 
       Ambil data dari form, simpan ke dalam variabel book
       bentuknya seperti ini:
@@ -95,12 +98,26 @@ async function handleEditForm(event) {
       }
     */
     // TODO: answer here
+    const title = document.getElementById('title').value.trim().split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+    const author = document.getElementById('author').value.trim().split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+    const year = parseInt(document.getElementById('year').value);
+    const quantity = parseInt(document.getElementById('quantity').value);
+    
+    let book = {
+      title: title,
+      author: author,
+      year: year,
+      quantity: quantity,
+    }
 
     // panggil function editBook dengan parameter book
     // TODO: answer here
-
+    const response = await editBook(book);
     currentBook = null;
-
     currentPage = 'home';
     loadPage();
   } catch (error) {
@@ -113,7 +130,7 @@ async function handleAddForm(event) {
   try {
     // gunakan preventDefault untuk mencegah browser melakukan reload halaman
     // TODO: answer here
-    
+    event.preventDefault();
     
     // return getBook;
     /*
@@ -128,11 +145,29 @@ async function handleAddForm(event) {
     */
     // TODO: answer here
 
+    const title = document.getElementById('title').value.trim().split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+    const author = document.getElementById('author').value.trim().split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+    const year = parseInt(document.getElementById('year').value);
+    const quantity = parseInt(document.getElementById('quantity').value);
+    
+    let book = {
+      title: title,
+      author: author,
+      year: year,
+      quantity: quantity,
+    }
+
     // panggil function addBook dengan parameter book
     // TODO: answer here
+    const request = await addBook(book);
 
     currentPage = 'home';
     loadPage();
+    
   } catch (error) {
     console.log(error);
     console.log('Terjadi kesalahan saat menambah buku');
@@ -142,13 +177,18 @@ async function handleAddForm(event) {
 function handleClickAddNav() {
   // ubah currentPage menjadi 'add'
   // TODO: answer here
+  
+  
+  currentPage = 'add';
   loadPage();
 }
 
 // add event listener click tag a didalam li dengan function handleClickAddNav
 const navLinks = document.querySelectorAll('li a');
 navLinks.forEach((navLink) => {
-  // TODO: answer here
+  navLink.addEventListener("click",()=>{
+    handleClickAddNav();
+  });
 });
 
 function generateRows(books) {
@@ -189,7 +229,7 @@ function generateRows(books) {
       </tr>`
     });
   }
-  console.log(rows)
+  
   return rows;
 }
 
@@ -223,6 +263,7 @@ async function loadPage() {
       const getBook = await fetchBooks();
 
       main.innerHTML = pageListMainContent;
+      
 
       const tableBody = document.querySelector('tbody');
       /* 
@@ -244,8 +285,12 @@ async function loadPage() {
         kemudian isi innerHTML dari form dengan formInput
       */
       // TODO: answer here
+      let formInput = generateEditFormInput();
+      form.innerHTML = formInput;
+
       break;
     case 'add':
+
       main.innerHTML = pageAddBookMainContent;
       break;
   }
@@ -276,6 +321,14 @@ async function addBook(book) {
       body yang dikirim adalah book yang dikirimkan sebagai parameter function
     */
     // TODO: answer here
+    const response = await fetch(" http://localhost:3333/books",{
+      method:"POST",
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify(book)
+    });
+    return await response.json();
   } catch (error) {
     console.log(error);
     console.log('Terjadi kesalahan saat menambah buku');
@@ -289,6 +342,14 @@ async function editBook(book) {
       body yang dikirim adalah book yang dikirimkan sebagai parameter function
     */
     // TODO: answer here
+    const response = await fetch(`http://localhost:3333/books/${currentBook.id}`,{
+      method:"PUT",
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify(book)
+    });
+    
   } catch (error) {
     console.log(error);
     console.log('Terjadi kesalahan saat mengubah buku');
